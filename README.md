@@ -1,3 +1,5 @@
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 ## What is this?
 - This is a small app meant to be deployed on Aptible that can monitor postgres databases.
 
