@@ -45,9 +45,22 @@ aptible logs --app datadog_postgres_monitor --environment ENVIRONMENT_NAME
 ```
 
 Run the docker container locally
-1. In `/usr/local/var/postgres/postgresql.conf` listen on all ports
-2. In `/usr/local/var/postgres/pg_hba.conf` add a user that can talk to locally aliased ports
-3. Start docker with `--net=host` and the aliased port
+1. Set a local private IP address to be a loopback address on your host machine: `sudo ifconfig lo0 alias 192.168.46.49`
+2. In `/usr/local/var/postgres/postgresql.conf` listen on all ports
+
+```
+listen_addresses = '*'
+```
+3. In `/usr/local/var/postgres/pg_hba.conf` add a user that can talk to locally aliased ports
+
+```
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# My local machine IP
+host    all         all         10.101.130.47/24    trust
+host    all         all         192.168.46.49/24    trust
+```
+4. Start docker with `--net=host` and the aliased port
 ```bash
 docker build . -t datadog_postgres_monitor
 docker run -e LOG_LEVEL=DEBUG -e TAGS='postgres-monitoring-local' --net=host -e API_KEY=123 \
