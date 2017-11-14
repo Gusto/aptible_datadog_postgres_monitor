@@ -68,3 +68,5 @@ docker run -e LOG_LEVEL=DEBUG -e TAGS='postgres-monitoring-local' --net=host -e 
 -e DB_TAGS_1=aptible_env:local_environment,aptible_app:local_app_name,env:local_environment,app:local_app_name,db:local_db \
 -it DOCKER_IMAGE_ID bash
 ```
+
+Note: You may have to set `ssl` to False and the db name to whatever your local database name is (type `\c` in the postgres shell to get the database name).
