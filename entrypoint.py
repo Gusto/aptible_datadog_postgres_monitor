@@ -15,7 +15,7 @@ def get_db_instance_dict(db_url, tags):
         'username': username,
         'password': password,
         'dbname': 'postgres',
-        'ssl': False,
+        'ssl': True,
         'tags': tags
     }
 
