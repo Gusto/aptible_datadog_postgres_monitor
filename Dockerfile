@@ -5,6 +5,7 @@ RUN apt-get update && apt-get -y install vim postgresql
 
 # Remove default metrics that are irrelevant from within an Aptible container
 RUN rm /etc/dd-agent/conf.d/docker_daemon.yaml /etc/dd-agent/conf.d/*.default
+ADD unix.py /opt/datadog-agent/agent/checks/system
 
 ADD entrypoint.py /entrypoint.py
 ADD combined_entry_point.sh /combined_entry_point.sh
