@@ -1,7 +1,6 @@
 import os
-from urlparse import urlparse
-from yaml import dump
-
+from urllib.parse import urlparse
+from ruamel import yaml
 
 def get_db_instance_dict(db_url, tags):
     url_components = urlparse(db_url)
@@ -9,15 +8,21 @@ def get_db_instance_dict(db_url, tags):
     port = url_components.port
     username = url_components.username
     password = url_components.password
-    database_instance = {
-        'host': host,
-        'port': port,
-        'username': username,
-        'password': password,
-        'dbname': 'postgres',
-        'ssl': False,
-        'tags': tags
-    }
+    database_instance = """\
+ -  server: {host}
+    user: {username}
+    pass: '{password}'
+    port: {port}
+    tags: {tags}
+    options:
+      replication: true
+      galera_cluster: true
+      extra_status_metrics: true
+      extra_innodb_metrics: true
+      extra_performance_metrics: true
+      schema_size_metrics: false
+      disable_innodb_metrics: false
+    """.format(host=host, username=username, password=password, port=port, tags=tags)
 
     return database_instance
 
@@ -43,10 +48,14 @@ def get_database_instances():
 
 
 if __name__ == "__main__":
-    yaml_dict = {
-        'init_config': '',
-        'instances': get_database_instances()
-    }
+    instances = "\n".join(get_database_instances())
+    yaml_dict = """\
+init_config:
 
-    with open('/conf.d/postgres.yaml', 'w') as outfile:
-        dump(yaml_dict, outfile, default_flow_style=False)
+instances:
+{instances}
+    """.format(instances=instances)
+
+    with open('/etc/datadog-agent/conf.d/mysql.d/conf.yaml', 'w') as outfile:
+        data = yaml.round_trip_load(yaml_dict, preserve_quotes=True)
+        yaml.round_trip_dump(data, outfile)
