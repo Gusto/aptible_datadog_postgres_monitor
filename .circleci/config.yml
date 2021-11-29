@@ -1,0 +1,101 @@
+version: 2.1
+
+orbs:
+  slack: circleci/slack@4.3.1
+  rollbar: rollbar/deploy@1.0.1
+
+executors:
+  ruby-executor:
+
+parameters:
+  slack_notify_deploy_snippet:
+    type: string
+    default: |
+      {
+        "type": "section",
+        "text": {
+          "type": "plain_text",
+          "text": ":snake: ${SLACK_DEPLOY_MSG}",
+          "emoji": true
+        }
+      }
+
+slack-fail: &slack-fail
+  event: fail
+  custom: |
+      {
+          "blocks": [
+            << pipeline.parameters.slack_notify_deploy_snippet >>
+          ]
+        }
+
+filter-only-main: &filter-only-main
+  filters:
+    branches:
+      only: master
+
+commands:
+  build_emojis:
+    steps:
+      - run:
+          name: Creating Slack Message Params
+          command: |
+            git log --pretty=format:'%s' -1 > /tmp/gitmessage.txt
+            sed -i 's/"//g' /tmp/gitmessage.txt
+            echo 'export GIT_MSG="$(cat /tmp/gitmessage.txt)"' >> $BASH_ENV
+            EMOJIS=(tada party-parrott pinata party_corgi awesome boom rollicking_reese boisterous_bryan gong fire nuclear)
+            echo ${EMOJIS[RANDOM%${#EMOJIS[@]}]} >> /tmp/emoji.txt
+            echo 'export EMOJI="$(cat /tmp/emoji.txt)"' >> $BASH_ENV
+
+jobs:
+  production_deploy:
+    working_directory: ~/aptible_datadog_mysql_monitor
+    docker:
+      - image: cimg/python:3.8
+    environment:
+      ROLLBAR_ENVIRONMENT: production
+    steps:
+      - checkout
+      - rollbar/notify_deploy_started:
+          environment: $ROLLBAR_ENVIRONMENT
+      - run: echo 'beta.aptible.com,52.21.95.179 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNaZz39sOOTC3UjU1yinYR6esinXJOzvcnFGHLbUWNyvjMQgl6rF6PFAgwtFWKcGXNNZ1c6grqWOklSmP85Yjkw=' >> ~/.ssh/known_hosts
+      - run: git push git@beta.aptible.com:weinfuse-production/api_production.git $CIRCLE_SHA1:master
+      - rollbar/notify_deploy_finished:
+          deploy_id: $ROLLBAR_DEPLOY_ID
+          status: succeeded
+
+workflows:
+  version: 2
+  continuous_integration_worflow:
+    jobs:
+      - production_hold:
+          <<: *filter-only-main
+          type: approval
+      - production_deploy:
+          <<: *filter-only-main
+          context:
+            - SlackIntegration
+          requires:
+            - production_hold
+          post-steps:
+            - build_emojis
+            - run:
+                name: On Fail Message
+                command: echo 'export SLACK_DEPLOY_MSG="Datadog Agent Deploy Failure :red_circle:"' >> $BASH_ENV
+                when: on_fail
+            - run:
+                name: On Pass Message
+                command: echo 'export SLACK_DEPLOY_MSG="Datadog Agent Deploy ${CIRCLE_USERNAME} :${EMOJI}:"' >> $BASH_ENV
+                when: on_success
+            - slack/notify:
+                <<: *slack-fail
+                channel: 'production-status'
+            - slack/notify:
+                event: pass
+                channel: 'production-status'
+                custom: |
+                    {
+                      "blocks": [
+                        << pipeline.parameters.slack_notify_deploy_snippet >>
+                      ]
+                    }
