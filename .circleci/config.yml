@@ -59,7 +59,7 @@ jobs:
       - rollbar/notify_deploy_started:
           environment: $ROLLBAR_ENVIRONMENT
       - run: echo 'beta.aptible.com,52.21.95.179 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNaZz39sOOTC3UjU1yinYR6esinXJOzvcnFGHLbUWNyvjMQgl6rF6PFAgwtFWKcGXNNZ1c6grqWOklSmP85Yjkw=' >> ~/.ssh/known_hosts
-      - run: git push git@beta.aptible.com:weinfuse-production/api_production.git $CIRCLE_SHA1:master
+      - run: git push git@beta.aptible.com:weinfuse-production/dd-agent-production.git $CIRCLE_SHA1:master
       - rollbar/notify_deploy_finished:
           deploy_id: $ROLLBAR_DEPLOY_ID
           status: succeeded
