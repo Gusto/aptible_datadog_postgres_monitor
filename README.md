@@ -1,5 +1,8 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
+## WeInfuse Release
+[2021-12-02] Add replica wi_replica_20211119
+
 ## What is this?
 - This is a small app meant to be deployed on Aptible that can monitor mysql databases.
 
