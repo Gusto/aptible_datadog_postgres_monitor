@@ -2,6 +2,7 @@
 
 ## WeInfuse Release
 [2021-12-02] Add replica wi_replica_20211119
+[2021-12-03] Make wi_replica_20211119 the datadog host:wi_replica
 
 ## What is this?
 - This is a small app meant to be deployed on Aptible that can monitor mysql databases.
