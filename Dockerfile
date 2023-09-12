@@ -1,6 +1,6 @@
 # This docker file will create a docker image on top of the datadog base agent
 # and provision a datadog Postgres configuration file based on DB urls in env MONITOR_DATABASE_URLS
-FROM datadog/agent
+FROM datadog/agent:7
 
 ADD entrypoint.py /entrypoint.py
 

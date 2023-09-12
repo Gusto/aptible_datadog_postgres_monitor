@@ -1,9 +1,13 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## WeInfuse Release
-[2021-12-02] Add replica wi_replica_20211119
-[2021-12-03] Make wi_replica_20211119 the datadog host:wi_replica
-[2021-12-17] Upgrade to latest datadog agent
+[2021-12-02]: Add replica wi_replica_20211119
+
+[2021-12-03]: Make wi_replica_20211119 the datadog host:wi_replica
+
+[2021-12-17]: Upgrade to latest datadog agent
+
+[2023-09-12]: Upgrade to latest datadog agent (7.47)
 
 ## What is this?
 - This is a small app meant to be deployed on Aptible that can monitor mysql databases.
